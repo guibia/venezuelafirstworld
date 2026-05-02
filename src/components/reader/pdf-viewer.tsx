@@ -13,8 +13,6 @@ const PDF_URL = "/VenezuelaFirstWorld.pdf"
 const WORKER_URL = "/pdf.worker.min.mjs"
 const INITIAL_PAGE = 9
 const PIXEL_RATIO = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1
-// Minimum render width on mobile — keeps A4 text comfortably readable (~14px body text)
-const MOBILE_MIN_WIDTH = 600
 
 export interface PdfViewerHandle {
   goToPage: (page: number) => void
@@ -30,8 +28,6 @@ export const PdfViewer = forwardRef<PdfViewerHandle, Props>(
     const canvasRefs = useRef<Map<number, HTMLCanvasElement>>(new Map())
     const [totalPages, setTotalPages] = useState(0)
     const [pageHeight, setPageHeight] = useState(0) // estimated height per page in CSS px
-    const [renderWidth, setRenderWidth] = useState(0) // actual CSS px width each page is drawn at
-    const [currentPage, setCurrentPage] = useState(INITIAL_PAGE)
     const [loadError, setLoadError] = useState<string | null>(null)
     const loadedPagesRef = useRef<Set<number>>(new Set())
     const pdfDocRef = useRef<unknown>(null)
@@ -58,11 +54,9 @@ export const PdfViewer = forwardRef<PdfViewerHandle, Props>(
           const vp = firstPage.getViewport({ scale: 1 })
           const container = containerRef.current
           if (container) {
-            const isMobile = window.innerWidth < 640
-            const containerWidth = container.clientWidth - (isMobile ? 0 : 32)
-            const rw = isMobile ? Math.max(containerWidth, MOBILE_MIN_WIDTH) : containerWidth
-            const estimatedHeight = (rw / vp.width) * vp.height
-            setRenderWidth(rw)
+            const padding = window.innerWidth < 640 ? 8 : 32
+            const containerWidth = container.clientWidth - padding
+            const estimatedHeight = (containerWidth / vp.width) * vp.height
             setPageHeight(estimatedHeight)
           }
 
@@ -97,18 +91,15 @@ export const PdfViewer = forwardRef<PdfViewerHandle, Props>(
         const container = containerRef.current
         if (!container) return
 
-        const isMobile = window.innerWidth < 640
-        const containerWidth = container.clientWidth - (isMobile ? 0 : 32)
-        const rw = isMobile ? Math.max(containerWidth, MOBILE_MIN_WIDTH) : containerWidth
-        const scale = (rw / viewport.width) * PIXEL_RATIO
+        const padding = window.innerWidth < 640 ? 8 : 32
+        const containerWidth = container.clientWidth - padding
+        const scale = (containerWidth / viewport.width) * PIXEL_RATIO
 
         const scaledViewport = page.getViewport({ scale })
-        const cssWidth = scaledViewport.width / PIXEL_RATIO
-        const cssHeight = scaledViewport.height / PIXEL_RATIO
         canvas.width = scaledViewport.width
         canvas.height = scaledViewport.height
-        canvas.style.width = `${cssWidth}px`
-        canvas.style.height = `${cssHeight}px`
+        canvas.style.width = `${scaledViewport.width / PIXEL_RATIO}px`
+        canvas.style.height = `${scaledViewport.height / PIXEL_RATIO}px`
 
         const ctx = canvas.getContext("2d")
         if (!ctx) return
@@ -168,7 +159,6 @@ export const PdfViewer = forwardRef<PdfViewerHandle, Props>(
 
         if (bestPage !== currentPageRef.current) {
           currentPageRef.current = bestPage
-          setCurrentPage(bestPage)
           onPageChange?.(bestPage)
         }
       }
@@ -205,48 +195,38 @@ export const PdfViewer = forwardRef<PdfViewerHandle, Props>(
     useImperativeHandle(ref, () => ({ goToPage }), [goToPage])
 
     return (
-      <div className="relative w-full">
-        {/* Scrollable viewer — on mobile: overflow both axes so users can pan after pinch-zoom */}
-        <div
-          ref={containerRef}
-          className="w-full overflow-auto rounded-lg bg-gray-100"
-          style={{
-            height: "calc(100dvh - 56px)",
-            overscrollBehavior: "contain",
-            WebkitOverflowScrolling: "touch",
-          } as React.CSSProperties}
-        >
-          {totalPages > 0 && pageHeight > 0 ? (
-            <div className="flex flex-col items-center gap-2 py-2 px-0 sm:p-4">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                <canvas
-                  key={pageNum}
-                  ref={(el) => {
-                    if (el) canvasRefs.current.set(pageNum, el)
-                    else canvasRefs.current.delete(pageNum)
-                  }}
-                  data-page={pageNum}
-                  className="shadow-md bg-white flex-shrink-0"
-                  style={{ width: renderWidth || "100%", height: pageHeight }}
-                />
-              ))}
-            </div>
-          ) : loadError ? (
-            <div className="flex flex-col items-center justify-center h-full px-4 text-center gap-2">
-              <p className="text-sm font-medium text-destructive">Could not load the PDF.</p>
-              <p className="text-xs text-muted-foreground max-w-md break-words">{loadError}</p>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-full text-muted-foreground">
-              Loading document…
-            </div>
-          )}
-        </div>
-
-        {/* Page counter — bottom-right, only when loaded */}
-        {totalPages > 0 && (
-          <div className="absolute bottom-3 right-3 flex items-center gap-2 bg-black/60 text-white text-xs rounded-full px-3 py-1.5 select-none pointer-events-none backdrop-blur-sm">
-            <span>{currentPage} / {totalPages}</span>
+      <div
+        ref={containerRef}
+        className="w-full overflow-y-auto overflow-x-hidden rounded-lg bg-gray-100"
+        style={{ height: "calc(100vh - 56px)" }}
+      >
+        {totalPages > 0 && pageHeight > 0 ? (
+          <div className="flex flex-col items-center gap-2 p-1 sm:p-4">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+              <canvas
+                key={pageNum}
+                ref={(el) => {
+                  if (el) canvasRefs.current.set(pageNum, el)
+                  else canvasRefs.current.delete(pageNum)
+                }}
+                data-page={pageNum}
+                className="shadow-md bg-white"
+                style={{ width: "100%", height: pageHeight }}
+              />
+            ))}
+          </div>
+        ) : loadError ? (
+          <div className="flex flex-col items-center justify-center h-full px-4 text-center gap-2">
+            <p className="text-sm font-medium text-destructive">Could not load the PDF.</p>
+            <p className="text-xs text-muted-foreground max-w-md break-words">{loadError}</p>
+            <p className="text-xs text-muted-foreground">
+              If this site is deployed under a subpath, ensure{" "}
+              <code className="rounded bg-muted px-1">NEXT_PUBLIC_BASE_PATH</code> matches that path at build time.
+            </p>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-full text-muted-foreground">
+            Loading document...
           </div>
         )}
       </div>
