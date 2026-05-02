@@ -37,6 +37,7 @@ export function TableOfContents({ parts, onChapterClick, allExpanded, activeChap
         {parts.map((part, partIdx) => {
           const key = part.number || `intro-${partIdx}`
           const isIntro = part.number === "INTRO"
+          const isAppendix = part.number === "APPENDIX"
           const open = isExpanded(key)
 
           return (
@@ -47,7 +48,7 @@ export function TableOfContents({ parts, onChapterClick, allExpanded, activeChap
               >
                 <div>
                   <span className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
-                    {isIntro ? part.number : `Part ${part.number}`}
+                    {isIntro || isAppendix ? part.number : `Part ${part.number}`}
                   </span>
                   <p className="text-base font-semibold mt-0.5">{part.title}</p>
                 </div>

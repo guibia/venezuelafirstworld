@@ -9,8 +9,11 @@ import {
   useCallback,
 } from "react"
 
-const PDF_URL = "/VenezuelaFirstWorld.pdf"
-const INITIAL_PAGE = 6
+import { withBasePath } from "@/lib/base-path"
+
+const PDF_URL = withBasePath("/VenezuelaFirstWorld.pdf")
+const WORKER_URL = withBasePath("/pdf.worker.min.mjs")
+const INITIAL_PAGE = 9
 const PIXEL_RATIO = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1
 
 export interface PdfViewerHandle {
@@ -27,6 +30,7 @@ export const PdfViewer = forwardRef<PdfViewerHandle, Props>(
     const canvasRefs = useRef<Map<number, HTMLCanvasElement>>(new Map())
     const [totalPages, setTotalPages] = useState(0)
     const [pageHeight, setPageHeight] = useState(0) // estimated height per page in CSS px
+    const [loadError, setLoadError] = useState<string | null>(null)
     const loadedPagesRef = useRef<Set<number>>(new Set())
     const pdfDocRef = useRef<unknown>(null)
     const currentPageRef = useRef(INITIAL_PAGE)
@@ -37,25 +41,34 @@ export const PdfViewer = forwardRef<PdfViewerHandle, Props>(
       let cancelled = false
 
       async function init() {
-        const pdfjs = await import("pdfjs-dist")
-        pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs"
+        try {
+          // Legacy build includes Map/WeakMap polyfills (e.g. getOrInsertComputed) required
+          // by some browsers; the default build expects very new JS engines.
+          const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs")
+          pdfjs.GlobalWorkerOptions.workerSrc = WORKER_URL
 
-        const doc = await pdfjs.getDocument(PDF_URL).promise
-        if (cancelled) return
-        pdfDocRef.current = doc
+          const doc = await pdfjs.getDocument(PDF_URL).promise
+          if (cancelled) return
+          pdfDocRef.current = doc
 
-        // Read first page to get aspect ratio for placeholders
-        const firstPage = await doc.getPage(1)
-        const vp = firstPage.getViewport({ scale: 1 })
-        const container = containerRef.current
-        if (container) {
-          const padding = window.innerWidth < 640 ? 8 : 32
-          const containerWidth = container.clientWidth - padding
-          const estimatedHeight = (containerWidth / vp.width) * vp.height
-          setPageHeight(estimatedHeight)
+          // Read first page to get aspect ratio for placeholders
+          const firstPage = await doc.getPage(1)
+          const vp = firstPage.getViewport({ scale: 1 })
+          const container = containerRef.current
+          if (container) {
+            const padding = window.innerWidth < 640 ? 8 : 32
+            const containerWidth = container.clientWidth - padding
+            const estimatedHeight = (containerWidth / vp.width) * vp.height
+            setPageHeight(estimatedHeight)
+          }
+
+          setTotalPages(doc.numPages)
+        } catch (e) {
+          if (!cancelled) {
+            const msg = e instanceof Error ? e.message : String(e)
+            setLoadError(msg)
+          }
         }
-
-        setTotalPages(doc.numPages)
       }
 
       init()
@@ -203,6 +216,15 @@ export const PdfViewer = forwardRef<PdfViewerHandle, Props>(
                 style={{ width: "100%", height: pageHeight }}
               />
             ))}
+          </div>
+        ) : loadError ? (
+          <div className="flex flex-col items-center justify-center h-full px-4 text-center gap-2">
+            <p className="text-sm font-medium text-destructive">Could not load the PDF.</p>
+            <p className="text-xs text-muted-foreground max-w-md break-words">{loadError}</p>
+            <p className="text-xs text-muted-foreground">
+              If this site is deployed under a subpath, ensure{" "}
+              <code className="rounded bg-muted px-1">NEXT_PUBLIC_BASE_PATH</code> matches that path at build time.
+            </p>
           </div>
         ) : (
           <div className="flex items-center justify-center h-full text-muted-foreground">

@@ -5,6 +5,7 @@ import { PdfViewer, type PdfViewerHandle } from "./pdf-viewer"
 import { TableOfContents } from "./table-of-contents"
 import { parts } from "@/data/toc"
 import { preamble } from "@/data/preamble"
+import { withBasePath } from "@/lib/base-path"
 
 interface ActiveLocation {
   partLabel: string
@@ -101,6 +102,8 @@ export function ReaderLayout() {
   const headerSubtitle = active
     ? active.partLabel === "INTRO"
       ? "Introduction"
+      : active.partLabel === "APPENDIX"
+      ? `Appendix — ${active.partTitle}`
       : `Part ${active.partLabel} — ${active.partTitle}`
     : "The Sovereign Reconstruction Blueprint"
 
@@ -144,7 +147,7 @@ export function ReaderLayout() {
             </p>
           </button>
           <a
-            href="/VenezuelaFirstWorld.pdf"
+            href={withBasePath("/VenezuelaFirstWorld.pdf")}
             download
             className="flex-shrink-0 ml-4 flex items-center justify-center w-8 h-8 rounded-md bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
             title="Download PDF"
@@ -189,8 +192,21 @@ export function ReaderLayout() {
         </div>
       )}
 
+      {/* Intro video */}
+      <div className="max-w-[680px] mx-auto px-6 pt-24 pb-0">
+        <div className="rounded-xl overflow-hidden shadow-lg">
+          <video
+            src={withBasePath("/intro.mp4")}
+            controls
+            playsInline
+            preload="metadata"
+            className="w-full block"
+          />
+        </div>
+      </div>
+
       {/* Preamble section */}
-      <article className="max-w-[680px] mx-auto px-6 pt-24 pb-16">
+      <article className="max-w-[680px] mx-auto px-6 pt-12 pb-16">
         <h2 className="font-serif text-4xl md:text-5xl leading-tight mb-8">
           {preamble.title}
         </h2>
@@ -234,7 +250,7 @@ export function ReaderLayout() {
       <div id="pdf-viewer" className="scroll-mt-14 max-w-5xl mx-auto px-2 sm:px-6 pb-32">
         <div className="flex items-center justify-center mb-4">
           <a
-            href="/VenezuelaFirstWorld.pdf"
+            href={withBasePath("/VenezuelaFirstWorld.pdf")}
             download
             className="inline-flex items-center gap-2 px-5 h-9 rounded-lg text-sm font-medium bg-[#1e2a3a] text-white hover:bg-[#2a3a4e] transition-colors"
           >

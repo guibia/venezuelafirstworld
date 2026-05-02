@@ -32,6 +32,9 @@ jobs:
         run: npm ci
 
       - name: Build static export
+        env:
+          # GitHub Pages project URL is /<repo>/ — root-relative /file.pdf would 404 without this.
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
         run: npm run build
 
       - name: Disable Jekyll

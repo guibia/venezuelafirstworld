@@ -1,4 +1,4 @@
-import { buttonVariants } from "@/components/ui/button"
+import { withBasePath } from "@/lib/base-path"
 import { cn } from "@/lib/utils"
 
 export function Hero() {
@@ -6,7 +6,7 @@ export function Hero() {
     <section className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/images/hero-caracas.png')" }}
+        style={{ backgroundImage: `url('${withBasePath("/images/hero-caracas.png")}')` }}
       />
       <div className="absolute inset-0 bg-black/80" />
 
@@ -31,7 +31,7 @@ export function Hero() {
             Read online
           </a>
           <a
-            href="/VenezuelaFirstWorld.pdf"
+            href={withBasePath("/VenezuelaFirstWorld.pdf")}
             download
             className={cn(
               "inline-flex items-center justify-center rounded-lg text-sm font-medium px-6 h-9 bg-black/50 text-white border border-white/15 hover:bg-black/40 transition-colors"
