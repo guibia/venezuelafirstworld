@@ -1,5 +1,3 @@
-import { withBasePath } from "@/lib/base-path"
-
 export function Footer() {
   return (
     <footer className="relative overflow-hidden">
@@ -31,7 +29,7 @@ export function Footer() {
             {/* Links row */}
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
               <a
-                href={withBasePath("/VenezuelaFirstWorld.pdf")}
+                href="/VenezuelaFirstWorld.pdf"
                 download
                 className="text-[11px] text-white/50 hover:text-white/80 transition-colors tracking-wide"
               >

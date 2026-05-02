@@ -9,10 +9,8 @@ import {
   useCallback,
 } from "react"
 
-import { withBasePath } from "@/lib/base-path"
-
-const PDF_URL = withBasePath("/VenezuelaFirstWorld.pdf")
-const WORKER_URL = withBasePath("/pdf.worker.min.mjs")
+const PDF_URL = "/VenezuelaFirstWorld.pdf"
+const WORKER_URL = "/pdf.worker.min.mjs"
 const INITIAL_PAGE = 9
 const PIXEL_RATIO = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1
 
