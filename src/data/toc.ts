@@ -1,7 +1,7 @@
 import type { PartDefinition } from "./types"
 
-/** Page numbers match pdf.js 1-based indices from VFW V1.0 (709 pages). */
-export const parts: PartDefinition[] = [
+/** English: page numbers are pdf.js 1-based indices for VFW V1.0 (709 pages). */
+export const partsEn: PartDefinition[] = [
   {
     number: "INTRO",
     title: "Why Venezuela",
@@ -129,3 +129,135 @@ export const parts: PartDefinition[] = [
     ],
   },
 ]
+
+/** Spanish: pdf.js 1-based indices for VFW V1.0 Español (835 pages). */
+export const partsEs: PartDefinition[] = [
+  {
+    number: "INTRO",
+    title: "¿Por qué Venezuela?",
+    chapters: [
+      { number: 0, title: "La oportunidad de 6 billones de dólares", page: 9 },
+      { number: 0, title: "¿Por qué ahora?", page: 15 },
+    ],
+  },
+  {
+    number: "I",
+    title: "El caso de Venezuela para la transformación",
+    chapters: [
+      { number: 1, title: "Venezuela en un punto de inflexión", page: 19 },
+      { number: 2, title: "Los recursos estructurales de Venezuela: una plataforma sin parangón", page: 25 },
+      { number: 3, title: "La Ventana Global: Capital, Demanda y Estrategia en Alineación", page: 33 },
+    ],
+  },
+  {
+    number: "II",
+    title: "Precedentes históricos y el imperativo de la escala",
+    chapters: [
+      { number: 4, title: "Cómo se reconstruyen las naciones: lecciones aplicables a Venezuela", page: 44 },
+      { number: 5, title: "Intensidad de capital en la actualidad: ¿Cuánto cuesta realmente un desarrollo de primera clase?", page: 52 },
+      { number: 6, title: "Por qué Venezuela puede comprimir varias décadas en una sola", page: 57 },
+    ],
+  },
+  {
+    number: "III",
+    title: "El plano de la obra nacional",
+    chapters: [
+      { number: 7, title: "Visión 2036: Una economía global de primera clase", page: 65 },
+      { number: 8, title: "Estrategia Espacial Nacional: Corredores, Ciudades y Plataformas", page: 71 },
+      { number: 9, title: "Fases de la transformación: una década de ejecución", page: 77 },
+      { number: 10, title: "Del proyecto a la realidad financiable", page: 81 },
+    ],
+  },
+  {
+    number: "IV",
+    title: "El Programa Nacional de Inversiones",
+    chapters: [
+      { number: 11, title: "Panorama general del Programa Nacional de Inversiones", page: 84 },
+      { number: 12, title: "Desarrollo de una superpotencia energética: petróleo, gas, GNL e hidrógeno verde", page: 104 },
+      { number: 13, title: "Energía, agua y resiliencia nacional", page: 132 },
+      { number: 14, title: "Transporte y logística: conectividad continental para una economía de primera clase", page: 159 },
+      { number: 15, title: "Puertos y energía marítima", page: 191 },
+      { number: 16, title: "Ciudades, Vivienda y Transformación Urbana", page: 223 },
+      { number: 17, title: "Salud, Educación y Capital Humano", page: 253 },
+      { number: 18, title: "Digital, IA y soberanía tecnológica", page: 292 },
+      { number: 19, title: "Industria, Zonas Económicas Especiales y Fabricación de Valor Agregado", page: 326 },
+      { number: 20, title: "Energía agrícola y agroindustrial", page: 356 },
+      { number: 21, title: "Estrategia turística y de destinos globales", page: 389 },
+      { number: 22, title: "Justicia y capacidad del Estado", page: 427 },
+      { number: 23, title: "Seguridad y Defensa Nacional", page: 458 },
+      { number: 24, title: "Sistema financiero y mercados de capitales", page: 487 },
+      { number: 25, title: "Remediación ambiental", page: 518 },
+      { number: 26, title: "Resumen consolidado de inversiones", page: 554 },
+      { number: 27, title: "La paradoja de la infraestructura y la matriz soberana del sur", page: 576 },
+    ],
+  },
+  {
+    number: "V",
+    title: "Financiación, gobernanza y ejecución",
+    chapters: [
+      {
+        number: 28,
+        title: "La Constitución Fiscal: Impuestos bajos, propiedad ciudadana y reconstrucción",
+        page: 597,
+      },
+      { number: 29, title: "Los tres primeros años: Fase de reajuste institucional", page: 605 },
+      { number: 30, title: "El Consejo Nacional de Reconstrucción (CNR)", page: 626 },
+      {
+        number: 31,
+        title: "El Estatuto Constitucional para la Reconstrucción de la República (ECRR)",
+        page: 635,
+      },
+      { number: 0, title: "Anexo — Programa Fiscal de Emergencia (Año 1)", page: 652 },
+    ],
+  },
+  {
+    number: "VI",
+    title: "Capital, socios y asignación",
+    chapters: [
+      { number: 32, title: "La estrategia de asociación", page: 660 },
+      { number: 33, title: "Capital soberano e institucional", page: 673 },
+      { number: 34, title: "Asignación de capital privado por sector", page: 691 },
+      { number: 35, title: "Estructuras de inversión y vías de acceso", page: 701 },
+    ],
+  },
+  {
+    number: "VII",
+    title: "Salto tecnológico",
+    chapters: [
+      { number: 36, title: "La doctrina del salto tecnológico", page: 720 },
+      { number: 37, title: "Inteligencia Artificial, Cuántica y Soberanía Digital", page: 735 },
+      { number: 38, title: "Hidrógeno verde y la frontera de la tecnología energética", page: 744 },
+      { number: 39, title: "Biotecnología, Genómica y Biología Sintética", page: 754 },
+      { number: 40, title: "El espacio, la economía orbital y la larga frontera", page: 766 },
+    ],
+  },
+  {
+    number: "VIII",
+    title: "El papel de Venezuela en el mundo",
+    chapters: [
+      { number: 41, title: "El nuevo papel geopolítico de Venezuela", page: 778 },
+      { number: 42, title: "Por qué este modelo importa: un manifiesto para la reconstrucción", page: 796 },
+    ],
+  },
+  {
+    number: "APPENDIX",
+    title: "El Estatuto Constitucional para la Reconstrucción de la República",
+    chapters: [
+      {
+        number: 0,
+        title: "Estatuto Constitucional para la Reconstrucción de la República",
+        page: 809,
+      },
+      { number: 0, title: "Título I — Principios Fundamentales", page: 811 },
+      { number: 0, title: "Título II — Derechos, Libertades y Deberes", page: 812 },
+      { number: 0, title: "Título III — El Orden Económico", page: 816 },
+      { number: 0, title: "Título IV — La Organización del Poder Público", page: 820 },
+      { number: 0, title: "Título V — Los Órganos de Control Estatal", page: 826 },
+      { number: 0, title: "Título VI — Política Exterior y Alianzas", page: 828 },
+      { number: 0, title: "Título VII — Supremacía y Reforma", page: 829 },
+    ],
+  },
+]
+
+/** Backwards-compatible default export (English) so any importer using `parts` keeps working. */
+export const parts = partsEn

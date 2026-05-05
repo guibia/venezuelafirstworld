@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import type { PartDefinition } from "@/data/types"
+import { useLanguage } from "@/lib/i18n"
+import { getStrings } from "@/lib/strings"
 
 interface TableOfContentsProps {
   parts: PartDefinition[]
@@ -11,6 +13,8 @@ interface TableOfContentsProps {
 }
 
 export function TableOfContents({ parts, onChapterClick, allExpanded, activeChapterNumber }: TableOfContentsProps) {
+  const { lang } = useLanguage()
+  const strings = getStrings(lang)
   // Start with Intro expanded
   const [expanded, setExpanded] = useState<string | null>("INTRO")
 
@@ -32,7 +36,7 @@ export function TableOfContents({ parts, onChapterClick, allExpanded, activeChap
 
   return (
     <div className={allExpanded ? "" : "mt-16 mb-20"}>
-      {!allExpanded && <h3 className="font-serif text-3xl mb-8">Table of Contents</h3>}
+      {!allExpanded && <h3 className="font-serif text-3xl mb-8">{strings.tocHeading}</h3>}
       <div className="space-y-1">
         {parts.map((part, partIdx) => {
           const key = part.number || `intro-${partIdx}`
@@ -48,7 +52,11 @@ export function TableOfContents({ parts, onChapterClick, allExpanded, activeChap
               >
                 <div>
                   <span className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
-                    {isIntro || isAppendix ? part.number : `Part ${part.number}`}
+                    {isIntro
+                      ? strings.tocIntro
+                      : isAppendix
+                      ? strings.tocAppendix
+                      : `${strings.tocPart} ${part.number}`}
                   </span>
                   <p className="text-base font-semibold mt-0.5">{part.title}</p>
                 </div>

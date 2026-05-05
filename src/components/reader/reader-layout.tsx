@@ -3,8 +3,13 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from "react"
 import { PdfViewer, type PdfViewerHandle } from "./pdf-viewer"
 import { TableOfContents } from "./table-of-contents"
-import { parts } from "@/data/toc"
-import { preamble } from "@/data/preamble"
+import { partsEn, partsEs } from "@/data/toc"
+import { preambleEn, preambleEs } from "@/data/preamble"
+import { useLanguage } from "@/lib/i18n"
+import { getStrings } from "@/lib/strings"
+import { LangPill } from "@/components/lang-pill"
+import { DownloadDropdown } from "@/components/download-dropdown"
+
 interface ActiveLocation {
   partLabel: string
   partTitle: string
@@ -12,12 +17,26 @@ interface ActiveLocation {
   chapterTitle: string
 }
 
+const PDF_URL_EN = "/VenezuelaFirstWorld.pdf"
+const PDF_URL_ES = "/VenezuelaFirstWorld-ES.pdf"
+
 export function ReaderLayout() {
+  const { lang } = useLanguage()
+  const strings = getStrings(lang)
+  const parts = lang === "es" ? partsEs : partsEn
+  const preamble = lang === "es" ? preambleEs : preambleEn
+  const pdfUrl = lang === "es" ? PDF_URL_ES : PDF_URL_EN
+
   const [headerVisible, setHeaderVisible] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
   const [active, setActive] = useState<ActiveLocation | null>(null)
   const readSectionRef = useRef<HTMLDivElement>(null)
   const pdfRef = useRef<PdfViewerHandle>(null)
+
+  // Reset active chapter when language (and therefore TOC) changes.
+  useEffect(() => {
+    setActive(null)
+  }, [lang])
 
   // Build a sorted lookup: [{ page, partLabel, partTitle, chapterNumber, chapterTitle }]
   const pageIndex = useMemo(() => {
@@ -34,9 +53,8 @@ export function ReaderLayout() {
       }
     }
     return entries.sort((a, b) => a.page - b.page)
-  }, [])
+  }, [parts])
 
-  // Find the location for a given page number
   const findLocationForPage = useCallback(
     (page: number): ActiveLocation | null => {
       let best: (typeof pageIndex)[number] | null = null
@@ -90,20 +108,19 @@ export function ReaderLayout() {
     }
   }, [findLocationForPage])
 
-  // Format the header title
   const headerTitle = active
     ? active.chapterNumber > 0
       ? `${active.chapterNumber}. ${active.chapterTitle}`
       : active.chapterTitle
-    : "Venezuela First World"
+    : strings.defaultHeaderTitle
 
   const headerSubtitle = active
     ? active.partLabel === "INTRO"
-      ? "Introduction"
+      ? strings.introduction
       : active.partLabel === "APPENDIX"
-      ? `Appendix — ${active.partTitle}`
-      : `Part ${active.partLabel} — ${active.partTitle}`
-    : "The Sovereign Reconstruction Blueprint"
+      ? `${strings.appendixPrefix} — ${active.partTitle}`
+      : `${strings.partPrefix} ${active.partLabel} — ${active.partTitle}`
+    : strings.defaultHeaderSubtitle
 
   return (
     <>
@@ -117,7 +134,7 @@ export function ReaderLayout() {
             : "-translate-y-full opacity-0"
         }`}
       >
-        <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between gap-3">
           <button
             onClick={() => setNavOpen(!navOpen)}
             className="min-w-0 flex-1 text-left cursor-pointer hover:opacity-80 transition-opacity"
@@ -144,27 +161,10 @@ export function ReaderLayout() {
               {headerSubtitle}
             </p>
           </button>
-          <a
-            href="/VenezuelaFirstWorld.pdf"
-            download
-            className="flex-shrink-0 ml-4 flex items-center justify-center w-8 h-8 rounded-md bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
-            title="Download PDF"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-            >
-              <path
-                d="M8 2v8m0 0L5 7m3 3l3-3M3 13h10"
-                stroke="black"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </a>
+          <div className="flex-shrink-0 flex items-center gap-2">
+            <LangPill variant="header" />
+            <DownloadDropdown variant="headerIcon" />
+          </div>
         </div>
       </header>
 
@@ -195,6 +195,7 @@ export function ReaderLayout() {
         <div className="rounded-xl overflow-hidden shadow-lg">
           <video
             src="/intro.mp4"
+            poster="/images/video-thumbnail.png"
             controls
             playsInline
             preload="metadata"
@@ -247,25 +248,15 @@ export function ReaderLayout() {
       {/* Embedded PDF */}
       <div id="pdf-viewer" className="scroll-mt-14 max-w-5xl mx-auto px-2 sm:px-6 pb-32">
         <div className="flex items-center justify-center mb-4">
-          <a
-            href="/VenezuelaFirstWorld.pdf"
-            download
-            className="inline-flex items-center gap-2 px-5 h-9 rounded-lg text-sm font-medium bg-[#1e2a3a] text-white hover:bg-[#2a3a4e] transition-colors"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M8 2v8m0 0L5 7m3 3l3-3M3 13h10"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Download PDF
-          </a>
+          <DownloadDropdown variant="cta" />
         </div>
         <div className="border border-gray-200 rounded-xl bg-gray-50 p-1 sm:p-3 md:p-4 shadow-sm overflow-hidden">
-          <PdfViewer ref={pdfRef} onPageChange={handlePageChange} />
+          <PdfViewer
+            key={pdfUrl}
+            ref={pdfRef}
+            pdfUrl={pdfUrl}
+            onPageChange={handlePageChange}
+          />
         </div>
       </div>
     </>

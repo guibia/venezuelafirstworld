@@ -9,7 +9,6 @@ import {
   useCallback,
 } from "react"
 
-const PDF_URL = "/VenezuelaFirstWorld.pdf"
 const WORKER_URL = "/pdf.worker.min.mjs"
 const INITIAL_PAGE = 9
 const PIXEL_RATIO = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1
@@ -19,11 +18,12 @@ export interface PdfViewerHandle {
 }
 
 interface Props {
+  pdfUrl: string
   onPageChange?: (page: number) => void
 }
 
 export const PdfViewer = forwardRef<PdfViewerHandle, Props>(
-  function PdfViewer({ onPageChange }, ref) {
+  function PdfViewer({ pdfUrl, onPageChange }, ref) {
     const containerRef = useRef<HTMLDivElement>(null)
     const canvasRefs = useRef<Map<number, HTMLCanvasElement>>(new Map())
     const [totalPages, setTotalPages] = useState(0)
@@ -45,7 +45,7 @@ export const PdfViewer = forwardRef<PdfViewerHandle, Props>(
           const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs")
           pdfjs.GlobalWorkerOptions.workerSrc = WORKER_URL
 
-          const doc = await pdfjs.getDocument(PDF_URL).promise
+          const doc = await pdfjs.getDocument(pdfUrl).promise
           if (cancelled) return
           pdfDocRef.current = doc
 
@@ -71,7 +71,7 @@ export const PdfViewer = forwardRef<PdfViewerHandle, Props>(
 
       init()
       return () => { cancelled = true }
-    }, [])
+    }, [pdfUrl])
 
     // Render a single page into its canvas
     const renderPage = useCallback(async (pageNum: number) => {

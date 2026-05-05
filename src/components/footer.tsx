@@ -1,4 +1,13 @@
+"use client"
+
+import { useLanguage } from "@/lib/i18n"
+import { getStrings } from "@/lib/strings"
+import { DownloadDropdown } from "@/components/download-dropdown"
+
 export function Footer() {
+  const { lang } = useLanguage()
+  const strings = getStrings(lang)
+
   return (
     <footer className="relative overflow-hidden">
       {/* Venezuelan flag — three horizontal bands: yellow, blue, red */}
@@ -28,19 +37,13 @@ export function Footer() {
           <div className="relative z-10 max-w-5xl mx-auto px-6 py-4 flex flex-col items-center gap-3">
             {/* Links row */}
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              <a
-                href="/VenezuelaFirstWorld.pdf"
-                download
-                className="text-[11px] text-white/50 hover:text-white/80 transition-colors tracking-wide"
-              >
-                Download PDF
-              </a>
+              <DownloadDropdown variant="footer" />
               <span className="text-white/20 text-[10px]">|</span>
               <a
                 href="#read"
                 className="text-[11px] text-white/50 hover:text-white/80 transition-colors tracking-wide"
               >
-                Read Online
+                {strings.footerReadOnline}
               </a>
               <span className="text-white/20 text-[10px]">|</span>
               <a
@@ -56,7 +59,7 @@ export function Footer() {
 
             {/* Credit line */}
             <p className="text-[10px] uppercase tracking-[0.2em] text-white/30">
-              The Sovereign Reconstruction Blueprint
+              {strings.footerTagline}
             </p>
           </div>
         </div>
